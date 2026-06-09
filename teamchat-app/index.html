@@ -1,0 +1,3072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamChat+</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #3a86ff;
+            --primary-dark: #2667cc;
+            --secondary: #8338ec;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --success: #38b000;
+            --danger: #e63946;
+            --warning: #ffaa00;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: var(--dark);
+            line-height: 1.6;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Static Background Gradients */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(125% 125% at 50% 10%, #fff 40%, #7c3aed 100%);
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                linear-gradient(45deg, transparent 49%, #e5e7eb 49%, #e5e7eb 51%, transparent 51%),
+                linear-gradient(-45deg, transparent 49%, #e5e7eb 49%, #e5e7eb 51%, transparent 51%);
+            background-size: 40px 40px;
+            -webkit-mask-image: radial-gradient(ellipse 100% 80% at 50% 100%, #000 50%, transparent 90%);
+            mask-image: radial-gradient(ellipse 100% 80% at 50% 100%, #000 50%, transparent 90%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(58, 134, 255, 0.4);
+        }
+
+        .btn:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #6a28c9;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 20px;
+            animation: cardSlideIn 0.5s ease;
+        }
+        
+        @keyframes cardSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.2);
+        }
+
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox input {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Welcome Page Styles */
+        .welcome-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .welcome-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .welcome-content h1 {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .welcome-content p {
+            font-size: 20px;
+            color: var(--gray);
+            max-width: 400px;
+        }
+
+        .welcome-card {
+            max-width: 400px;
+        }
+
+        .welcome-card h2 {
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .button-group .btn {
+            flex: 1;
+        }
+
+        /* Rooms Page Styles */
+        .rooms-page {
+            min-height: 100vh;
+            padding: 40px 0;
+            position: relative;
+        }
+
+        .rooms-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .search-bar input {
+            flex: 1;
+        }
+
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .room-card {
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+            transition: var(--transition);
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .room-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .room-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Chat Room Styles */
+        .chat-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            min-width: 200px;
+            max-width: 500px;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--gray-light);
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        .sidebar-resizer {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            cursor: ew-resize;
+            background: transparent;
+            z-index: 10;
+            transition: background-color 0.2s ease;
+        }
+        
+        .sidebar-resizer:hover {
+            background-color: rgba(58, 134, 255, 0.3);
+        }
+        
+        .sidebar-resizer.resizing {
+            background-color: rgba(58, 134, 255, 0.6);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .sidebar-toggle:hover {
+            color: var(--primary);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-section h3 {
+            font-size: 11px;
+            color: var(--gray);
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            padding-left: 10px;
+        }
+
+        .sidebar-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sidebar-list li {
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .sidebar-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar-list li::after {
+            content: '';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-list li:hover {
+            background: linear-gradient(135deg, rgba(58, 134, 255, 0.08), rgba(131, 56, 236, 0.08));
+            transform: translateX(4px);
+        }
+        
+        .sidebar-list li:hover::before {
+            transform: scaleY(1);
+        }
+
+        .sidebar-list li.active {
+            background: linear-gradient(135deg, rgba(58, 134, 255, 0.15), rgba(131, 56, 236, 0.15));
+            color: var(--primary);
+            font-weight: 600;
+            border: 1px solid rgba(58, 134, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.15);
+        }
+        
+        .sidebar-list li.active::before {
+            transform: scaleY(1);
+        }
+        
+        .sidebar-list li.active::after {
+            background-color: var(--primary);
+            box-shadow: 0 0 8px var(--primary);
+        }
+
+        .sidebar-list li.highlighted {
+            background: linear-gradient(135deg, rgba(255, 170, 0, 0.15), rgba(255, 170, 0, 0.08));
+            color: var(--warning);
+            font-weight: 600;
+            border: 1px solid rgba(255, 170, 0, 0.2);
+        }
+        
+        .sidebar-list li.highlighted::after {
+            background-color: var(--warning);
+            animation: pulse 2s infinite;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--gray-light);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
+        }
+        
+        .sidebar-footer #user-avatar {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.3);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--gray-light);
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideDown 0.4s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-action-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .chat-action-btn:hover {
+            color: var(--primary);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            max-width: 70%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.own {
+            margin-left: auto;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .message-sender {
+            font-weight: 500;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .message-content {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .message-content:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .message.own .message-content {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--gray);
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--gray);
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+            backdrop-filter: blur(15px);
+            border-top: 1px solid var(--gray-light);
+            display: flex;
+            gap: 12px;
+            animation: slideUp 0.4s ease;
+            align-items: flex-end;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid transparent;
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, var(--primary), var(--secondary)) border-box;
+            border-radius: 24px;
+            resize: none;
+            font-size: 15px;
+            max-height: 120px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            box-shadow: 0 4px 16px rgba(58, 134, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .chat-input::placeholder {
+            color: var(--gray);
+            font-weight: 400;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .input-action-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 250, 0.9));
+            border: 2px solid transparent;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: all 0.3s ease;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .input-action-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .input-action-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.3);
+            color: var(--primary);
+        }
+        
+        .input-action-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .input-action-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+        
+        #send-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            width: 52px;
+            height: 52px;
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.4);
+        }
+        
+        #send-btn::before {
+            display: none;
+        }
+        
+        #send-btn:hover {
+            box-shadow: 0 6px 20px rgba(58, 134, 255, 0.5);
+            transform: translateY(-2px) scale(1.08);
+        }
+
+        .input-action-btn.recording {
+            background-color: rgba(230, 57, 70, 0.1);
+            color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* SHARED FILES SIDEBAR STYLES */
+        .files-sidebar {
+            width: 300px;
+            min-width: 250px;
+            max-width: 600px;
+            background: linear-gradient(135deg, rgba(131, 56, 236, 0.03), rgba(58, 134, 255, 0.03));
+            backdrop-filter: blur(15px);
+            border-left: 1px solid rgba(131, 56, 236, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        .files-sidebar.collapsed {
+            width: 0;
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        .files-sidebar-resizer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            cursor: ew-resize;
+            background: transparent;
+            z-index: 10;
+            transition: background-color 0.2s ease;
+        }
+        
+        .files-sidebar-resizer:hover {
+            background-color: rgba(58, 134, 255, 0.3);
+        }
+        
+        .files-sidebar-resizer.resizing {
+            background-color: rgba(58, 134, 255, 0.6);
+        }
+
+        .files-header {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(131, 56, 236, 0.12), rgba(58, 134, 255, 0.08));
+            border-bottom: 1px solid rgba(131, 56, 236, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .files-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .toggle-files {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray);
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        .toggle-files:hover {
+            color: var(--dark);
+        }
+
+        .files-categories {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--gray-light);
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+        
+        .files-categories::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .files-categories::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .files-categories::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: nowrap;
+        }
+
+        .category-tab {
+            padding: 10px 18px;
+            background-color: rgba(248, 249, 250, 0.8);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            min-width: fit-content;
+        }
+        
+        .category-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .category-tab:hover::before {
+            left: 100%;
+        }
+
+        .category-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(58, 134, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .category-tab:hover {
+            background-color: rgba(233, 236, 239, 0.9);
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .category-tab.active:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: scale(1.05);
+        }
+
+        .files-list {
+            flex: 1;
+            padding: 15px 0;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--gray-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            border-radius: 8px;
+            margin: 0 10px 8px 10px;
+        }
+        
+        .file-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .file-item:hover {
+            background: linear-gradient(135deg, rgba(58, 134, 255, 0.05), rgba(131, 56, 236, 0.05));
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .file-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        .file-icon {
+            width: 44px;
+            height: 44px;
+            background-color: #e9ecef;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3), transparent);
+            transform: scale(0);
+            transition: transform 0.5s;
+        }
+        
+        .file-item:hover .file-icon::before {
+            transform: scale(1);
+        }
+
+        .file-icon.pdf {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+
+        .file-icon.figma {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
+        }
+
+        .file-icon.image {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .file-icon.audio {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
+
+        .file-icon.video {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            color: white;
+            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+        }
+
+        .file-icon.archive {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+            box-shadow: 0 4px 12px rgba(149, 165, 166, 0.3);
+        }
+        
+        .file-item:hover .file-icon {
+            transform: rotate(5deg) scale(1.05);
+        }
+
+        .file-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--dark);
+            transition: color 0.3s ease;
+        }
+        
+        .file-item:hover .file-name {
+            color: var(--primary);
+        }
+
+        .file-meta {
+            font-size: 11px;
+            color: var(--gray);
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+        }
+
+        .file-item-content {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Toggle button in main chat */
+        .files-toggle {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 10;
+        }
+
+        .files-toggle:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--dark);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Participants List */
+        .participant-list {
+            list-style: none;
+        }
+
+        .participant-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .participant-avatar {
+            width: 40px;
+                height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+        }
+
+        .participant-info {
+            flex: 1;
+        }
+
+        .participant-name {
+            font-weight: 500;
+        }
+
+        .participant-status {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .participant-status.online {
+            color: var(--success);
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 2px dashed var(--gray-light);
+            border-radius: var(--border-radius);
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+        }
+
+        .file-upload-area.active {
+            border-color: var(--primary);
+            background-color: rgba(58, 134, 255, 0.05);
+        }
+
+        .file-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .file-item:hover {
+            background-color: var(--gray-light);
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--border-radius);
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .file-meta {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* Pinned Messages */
+        .pinned-section {
+            margin-top: 30px;
+        }
+
+        .pinned-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--warning);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pinned-item:hover {
+            transform: translateX(5px);
+        }
+
+        .pinned-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .pinned-icon {
+            color: var(--warning);
+        }
+
+        .pinned-sender {
+            font-weight: 500;
+        }
+
+        .pinned-content {
+            color: var(--dark);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .notification-icon {
+            font-size: 20px;
+        }
+
+        .notification.success .notification-icon {
+            color: var(--success);
+        }
+
+        .notification.error .notification-icon {
+            color: var(--danger);
+        }
+
+        /* Speech Recognition */
+        .speech-recognition {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .speech-status {
+            padding: 10px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .speech-status.listening {
+            background-color: rgba(56, 176, 0, 0.1);
+            color: var(--success);
+        }
+
+        .speech-status.error {
+            background-color: rgba(230, 57, 70, 0.1);
+            color: var(--danger);
+        }
+
+        .speech-text {
+            padding: 15px;
+            background-color: var(--gray-light);
+            border-radius: var(--border-radius);
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* Microphone Permission */
+        .microphone-permission {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .permission-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .permission-options {
+            margin-top: 15px;
+        }
+
+        .permission-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+        }
+
+        /* Alternative Voice Input */
+        .alternative-voice {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .alternative-voice h4 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .voice-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .voice-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .voice-option:hover {
+            background-color: var(--gray-light);
+        }
+
+        .voice-option.active {
+            background-color: rgba(58, 134, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .welcome-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .welcome-content {
+                text-align: center;
+            }
+            
+            .welcome-content p {
+                margin: 0 auto;
+            }
+            
+            .sidebar {
+                position: absolute;
+                z-index: 100;
+                height: 100%;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+            
+            .files-sidebar {
+                position: absolute;
+                right: 0;
+                z-index: 100;
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Page -->
+    <div id="welcome-page" class="welcome-page">
+        <div class="container">
+            <div class="welcome-container">
+                <div class="welcome-content">
+                    <h1>TeamChat+</h1>
+                    <p>Connect, collaborate, and communicate seamlessly</p>
+                </div>
+                <div class="welcome-card card">
+                    <h2>Create or join a chat room</h2>
+                    <form id="welcome-form">
+                        <div class="form-group">
+                            <label for="user-name" class="form-label">Your Name</label>
+                            <input type="text" id="user-name" class="form-control" placeholder="Enter your name">
+                        </div>
+                        <div class="form-group">
+                            <label for="room-name" class="form-label">Room Name</label>
+                            <input type="text" id="room-name" class="form-control" placeholder="Enter room name">
+                        </div>
+                        <div class="button-group">
+                            <button type="button" id="create-room-btn" class="btn" disabled>Create Room</button>
+                            <button type="button" id="join-room-btn" class="btn btn-secondary" disabled>Join Room</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rooms Page -->
+    <div id="rooms-page" class="rooms-page" style="display: none;">
+        <div class="container">
+            <div class="rooms-header">
+                <h1>Public Rooms</h1>
+                <button id="create-public-room" class="btn">Create Room</button>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="room-search" class="form-control" placeholder="Search for rooms...">
+                <button class="btn" id="search-rooms-btn">Search</button>
+            </div>
+            <div class="rooms-grid" id="rooms-grid">
+                <!-- Room cards will be dynamically generated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Room -->
+    <div id="chat-room" class="chat-container" style="display: none;">
+        <!-- Left Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-resizer" id="sidebar-resizer"></div>
+            <div class="sidebar-header">
+                <h2>TeamChat+</h2>
+                <button class="sidebar-toggle" id="sidebar-toggle">←</button>
+            </div>
+            <div class="sidebar-content">
+                <div class="sidebar-section">
+                    <h3>SEARCH ROOMS</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="search-rooms-input" class="form-control" placeholder="Search rooms...">
+                        <button class="btn" style="padding: 10px;" id="search-rooms-sidebar-btn">Search</button>
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <h3>MY GROUPS</h3>
+                    <ul class="sidebar-list" id="groups-list">
+                        <li class="active" data-group="general">General</li>
+                        <li data-group="design">Design Team</li>
+                        <li data-group="engineering">Engineering</li>
+                        <li data-group="marketing">Marketing</li>
+                        <li data-group="random">Random</li>
+                    </ul>
+                </div>
+                <div class="sidebar-section">
+                    <h3>MENU</h3>
+                    <ul class="sidebar-list">
+                        <li id="home-menu">Home</li>
+                        <li id="room-settings-menu">Room Settings</li>
+                        <li id="show-participants">Participants</li>
+                        <li id="leave-room-menu" style="color: var(--danger);">Leave</li>
+                    </ul>
+                </div>
+                <div class="sidebar-section pinned-section">
+                    <h3>Pinned Messages</h3>
+                    <div class="pinned-item">
+                        <div class="pinned-header">
+                            <span class="pinned-icon">📌</span>
+                            <span class="pinned-sender">Alex</span>
+                        </div>
+                        <div class="pinned-content">Remember to submit the project proposal by Friday!</div>
+                    </div>
+                    <div class="pinned-item">
+                        <div class="pinned-header">
+                            <span class="pinned-icon">📌</span>
+                            <span class="pinned-sender">Sarah</span>
+                        </div>
+                        <div class="pinned-content">Team meeting moved to 3 PM tomorrow.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background-color: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-weight: 500;" id="user-avatar">U</div>
+                    <div>
+                        <div id="sidebar-username">User</div>
+                        <div style="font-size: 12px; color: var(--success);">Online</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <button class="files-toggle" id="toggleFilesBtn">📁 Shared Files</button>
+            
+            <div class="chat-header">
+                <div class="chat-title">
+                    <button class="sidebar-toggle" id="sidebar-open" style="display: none;">☰</button>
+                    <h2 id="room-title">General</h2>
+                    <span id="member-count">12 members</span>
+                </div>
+                <!-- Removed the participants button from header -->
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be dynamically generated -->
+            </div>
+            <div class="chat-input-area">
+                <textarea class="chat-input" id="message-input" placeholder="Write your message..."></textarea>
+                <div class="input-actions">
+                    <button class="input-action-btn" id="attach-file-btn">📎</button>
+                    <button class="input-action-btn" id="emoji-btn">😊</button>
+                    <button class="input-action-btn" id="voice-btn">🎤</button>
+                    <button class="btn" id="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shared Files Sidebar -->
+        <div class="files-sidebar" id="filesSidebar">
+            <div class="files-sidebar-resizer" id="files-sidebar-resizer"></div>
+            <div class="files-header">
+                <div class="files-title">Shared Files</div>
+                <button class="toggle-files" id="closeFilesBtn">✕</button>
+            </div>
+            
+            <div class="files-categories">
+                <div class="category-tabs">
+                    <div class="category-tab active" data-category="all">All Files</div>
+                    <div class="category-tab" data-category="documents">Documents</div>
+                    <div class="category-tab" data-category="photos">Photos</div>
+                    <div class="category-tab" data-category="audio">Audio</div>
+                    <div class="category-tab" data-category="videos">Videos</div>
+                    <div class="category-tab" data-category="archives">Archives</div>
+                </div>
+            </div>
+            
+            <div class="files-list" id="filesList">
+                <!-- Files will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Participants Modal -->
+    <div class="modal" id="participants-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Participants</h3>
+                <button class="modal-close" id="close-participants">&times;</button>
+            </div>
+            <div class="modal-body">
+                <ul class="participant-list" id="participant-list">
+                    <!-- Participants will be dynamically generated -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload Modal -->
+    <div class="modal" id="file-upload-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Upload File</h3>
+                <button class="modal-close" id="close-file-upload">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="file-upload-area" id="file-drop-area">
+                    <p>Drag & drop files here or click to browse</p>
+                    <input type="file" id="file-input" style="display: none;" multiple>
+                </div>
+                <ul class="file-list" id="file-list">
+                    <!-- Files will be dynamically generated -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-upload">Cancel</button>
+                <button class="btn" id="upload-files">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emoji Picker Modal -->
+    <div class="modal" id="emoji-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Select Emoji</h3>
+                <button class="modal-close" id="close-emoji">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px;" id="emoji-container">
+                    <!-- Emojis will be dynamically generated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Speech Recognition Modal -->
+    <div class="modal" id="speech-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Voice Message</h3>
+                <button class="modal-close" id="close-speech">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="speech-recognition">
+                    <div class="speech-status" id="speech-status">
+                        Click "Start Listening" to begin
+                    </div>
+                    <div class="speech-text" id="speech-text">
+                        Your speech will appear here...
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button class="btn" id="start-listening">Start Listening</button>
+                        <button class="btn btn-secondary" id="stop-listening" disabled>Stop Listening</button>
+                    </div>
+                </div>
+                
+                <!-- Alternative Voice Input Section -->
+                <div class="alternative-voice" id="alternative-voice">
+                    <h4>Alternative Voice Input</h4>
+                    <p>If browser microphone doesn't work, try these options:</p>
+                    <div class="voice-options">
+                        <div class="voice-option" id="type-manually-option">
+                            <i class="fas fa-keyboard"></i>
+                            <span>Type message manually</span>
+                        </div>
+                        <div class="voice-option" id="simulate-voice-option">
+                            <i class="fas fa-robot"></i>
+                            <span>Use simulated voice input</span>
+                        </div>
+                        <div class="voice-option" id="external-app-option">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span>Use external voice app</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Microphone Permission Section -->
+                <div class="microphone-permission" id="microphone-permission" style="display: none;">
+                    <div class="permission-header">
+                        <i class="fas fa-microphone"></i>
+                        <h4>Microphone Access Required</h4>
+                    </div>
+                    <p>TeamChat+ needs access to your microphone for voice messages.</p>
+                    <div class="permission-options">
+                        <div class="permission-option">
+                            <input type="radio" id="allow-once" name="permission" checked>
+                            <label for="allow-once">Allow this time</label>
+                        </div>
+                        <div class="permission-option">
+                            <input type="radio" id="allow-always" name="permission">
+                            <label for="allow-always">Always allow on this site</label>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button class="btn" id="allow-microphone">Allow</button>
+                        <button class="btn btn-outline" id="block-microphone">Block</button>
+                    </div>
+                </div>
+                
+                <!-- No Microphone Available Section -->
+                <div class="microphone-permission" id="no-microphone" style="display: none;">
+                    <div class="permission-header">
+                        <i class="fas fa-microphone-slash"></i>
+                        <h4>No microphone available</h4>
+                    </div>
+                    <p>Check your microphone settings or try alternative input methods.</p>
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button class="btn" id="manage-microphone">Check Settings</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-speech">Cancel</button>
+                <button class="btn" id="send-speech" disabled>Send as Message</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room Settings Modal -->
+    <div class="modal" id="room-settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Room Settings</h3>
+                <button class="modal-close" id="close-room-settings">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="room-name-setting" class="form-label">Room Name</label>
+                    <input type="text" id="room-name-setting" class="form-control" value="General">
+                </div>
+                <div class="form-group">
+                    <label for="room-description" class="form-label">Room Description</label>
+                    <textarea id="room-description" class="form-control" rows="3">General discussion room for all team members</textarea>
+                </div>
+                <div class="checkbox">
+                    <input type="checkbox" id="room-private">
+                    <label for="room-private">Make room private</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-room-settings">Cancel</button>
+                <button class="btn" id="save-room-settings">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification" style="display: none;">
+        <div class="notification-icon"></div>
+        <div class="notification-message"></div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const welcomePage = document.getElementById('welcome-page');
+        const roomsPage = document.getElementById('rooms-page');
+        const chatRoom = document.getElementById('chat-room');
+        
+        // Welcome Page Elements
+        const userNameInput = document.getElementById('user-name');
+        const roomNameInput = document.getElementById('room-name');
+        const createRoomBtn = document.getElementById('create-room-btn');
+        const joinRoomBtn = document.getElementById('join-room-btn');
+        
+        // Chat Room Elements
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarOpen = document.getElementById('sidebar-open');
+        const roomTitle = document.getElementById('room-title');
+        const memberCount = document.getElementById('member-count');
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        const attachFileBtn = document.getElementById('attach-file-btn');
+        const emojiBtn = document.getElementById('emoji-btn');
+        const voiceBtn = document.getElementById('voice-btn');
+        const userAvatar = document.getElementById('user-avatar');
+        const sidebarUsername = document.getElementById('sidebar-username');
+        const groupsList = document.getElementById('groups-list');
+        const searchRoomsInput = document.getElementById('search-rooms-input');
+        const searchRoomsSidebarBtn = document.getElementById('search-rooms-sidebar-btn');
+        
+        // Shared Files Sidebar Elements
+        const filesSidebar = document.getElementById('filesSidebar');
+        const toggleFilesBtn = document.getElementById('toggleFilesBtn');
+        const closeFilesBtn = document.getElementById('closeFilesBtn');
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const filesList = document.getElementById('filesList');
+        
+        // Menu Items
+        const homeMenu = document.getElementById('home-menu');
+        const roomSettingsMenu = document.getElementById('room-settings-menu');
+        const leaveRoomMenu = document.getElementById('leave-room-menu');
+        
+        // Modal Elements
+        const participantsModal = document.getElementById('participants-modal');
+        const showParticipantsBtn = document.getElementById('show-participants');
+        const closeParticipantsBtn = document.getElementById('close-participants');
+        const participantList = document.getElementById('participant-list');
+        
+        const fileUploadModal = document.getElementById('file-upload-modal');
+        const closeFileUploadBtn = document.getElementById('close-file-upload');
+        const fileDropArea = document.getElementById('file-drop-area');
+        const fileInput = document.getElementById('file-input');
+        const fileList = document.getElementById('file-list');
+        const cancelUploadBtn = document.getElementById('cancel-upload');
+        const uploadFilesBtn = document.getElementById('upload-files');
+        
+        const emojiModal = document.getElementById('emoji-modal');
+        const closeEmojiBtn = document.getElementById('close-emoji');
+        const emojiContainer = document.getElementById('emoji-container');
+        
+        const speechModal = document.getElementById('speech-modal');
+        const closeSpeechBtn = document.getElementById('close-speech');
+        const speechStatus = document.getElementById('speech-status');
+        const speechText = document.getElementById('speech-text');
+        const startListeningBtn = document.getElementById('start-listening');
+        const stopListeningBtn = document.getElementById('stop-listening');
+        const cancelSpeechBtn = document.getElementById('cancel-speech');
+        const sendSpeechBtn = document.getElementById('send-speech');
+        const microphonePermission = document.getElementById('microphone-permission');
+        const noMicrophone = document.getElementById('no-microphone');
+        const allowMicrophoneBtn = document.getElementById('allow-microphone');
+        const blockMicrophoneBtn = document.getElementById('block-microphone');
+        const manageMicrophoneBtn = document.getElementById('manage-microphone');
+        const alternativeVoice = document.getElementById('alternative-voice');
+        const typeManuallyOption = document.getElementById('type-manually-option');
+        const simulateVoiceOption = document.getElementById('simulate-voice-option');
+        const externalAppOption = document.getElementById('external-app-option');
+        
+        const roomSettingsModal = document.getElementById('room-settings-modal');
+        const closeRoomSettingsBtn = document.getElementById('close-room-settings');
+        const cancelRoomSettingsBtn = document.getElementById('cancel-room-settings');
+        const saveRoomSettingsBtn = document.getElementById('save-room-settings');
+        const roomPrivateCheckbox = document.getElementById('room-private');
+        
+        // Notification Element
+        const notification = document.getElementById('notification');
+        
+        // Resizer Elements
+        const sidebarResizer = document.getElementById('sidebar-resizer');
+        const filesSidebarResizer = document.getElementById('files-sidebar-resizer');
+        
+        // Application State
+        let currentUser = '';
+        let currentRoom = '';
+        let currentGroup = 'general';
+        let isRecording = false;
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioStream = null;
+        let typingTimer = null;
+        let isTyping = false;
+        let recognition = null;
+        let isListening = false;
+        let hasMicrophonePermission = false;
+        let voiceInputMethod = 'browser'; // 'browser', 'simulated', 'external'
+        
+        // Sample data for demonstration
+        const sampleRooms = [
+            { id: 1, name: 'General', members: 12 },
+            { id: 2, name: 'Design Team', members: 8 },
+            { id: 3, name: 'Engineering', members: 15 },
+            { id: 4, name: 'Marketing', members: 6 },
+            { id: 5, name: 'Random', members: 20 },
+            { id: 6, name: 'Project Alpha', members: 5 }
+        ];
+        
+        const sampleParticipants = [
+            { id: 1, name: 'Alex Johnson', status: 'online', avatar: 'AJ' },
+            { id: 2, name: 'Sarah Miller', status: 'online', avatar: 'SM' },
+            { id: 3, name: 'Michael Chen', status: 'online', avatar: 'MC' },
+            { id: 4, name: 'Emily Davis', status: 'away', avatar: 'ED' },
+            { id: 5, name: 'David Wilson', status: 'online', avatar: 'DW' },
+            { id: 6, name: 'Jessica Brown', status: 'online', avatar: 'JB' }
+        ];
+        
+        // Sample files data
+        const filesData = {
+            all: [
+                { name: 'Project Proposal.pdf', type: 'pdf', owner: 'Sarah Chen', date: 'Nov 15, 10:30 AM' },
+                { name: 'Design System.figma', type: 'figma', owner: 'Mike Johnson', date: 'Nov 14, 2:45 PM' },
+                { name: 'Team Photo.jpg', type: 'image', owner: 'Alex Johnson', date: 'Nov 13, 4:20 PM' },
+                { name: 'Meeting Recording.mp3', type: 'audio', owner: 'David Wilson', date: 'Nov 12, 11:15 AM' },
+                { name: 'User Research.docx', type: 'pdf', owner: 'Emma Davis', date: 'Nov 11, 3:40 PM' },
+                { name: 'Sprint Review.mp4', type: 'video', owner: 'Sarah Miller', date: 'Nov 10, 9:30 AM' },
+                { name: 'Backup Files.zip', type: 'archive', owner: 'IT Team', date: 'Nov 9, 5:00 PM' }
+            ],
+            documents: [
+                { name: 'Project Proposal.pdf', type: 'pdf', owner: 'Sarah Chen', date: 'Nov 15, 10:30 AM' },
+                { name: 'User Research.docx', type: 'pdf', owner: 'Emma Davis', date: 'Nov 11, 3:40 PM' },
+                { name: 'Technical Specifications.pdf', type: 'pdf', owner: 'Mike Johnson', date: 'Nov 8, 1:20 PM' }
+            ],
+            photos: [
+                { name: 'Team Photo.jpg', type: 'image', owner: 'Alex Johnson', date: 'Nov 13, 4:20 PM' },
+                { name: 'UI Screenshots.png', type: 'image', owner: 'Design Team', date: 'Nov 7, 2:15 PM' }
+            ],
+            audio: [
+                { name: 'Meeting Recording.mp3', type: 'audio', owner: 'David Wilson', date: 'Nov 12, 11:15 AM' },
+                { name: 'Client Feedback.wav', type: 'audio', owner: 'Sarah Miller', date: 'Nov 5, 10:00 AM' }
+            ],
+            videos: [
+                { name: 'Sprint Review.mp4', type: 'video', owner: 'Sarah Miller', date: 'Nov 10, 9:30 AM' },
+                { name: 'Product Demo.mov', type: 'video', owner: 'Alex Johnson', date: 'Nov 6, 3:45 PM' }
+            ],
+            archives: [
+                { name: 'Backup Files.zip', type: 'archive', owner: 'IT Team', date: 'Nov 9, 5:00 PM' },
+                { name: 'Old Documents.rar', type: 'archive', owner: 'Archive', date: 'Nov 1, 12:00 PM' }
+            ]
+        };
+        
+        // Group-specific messages
+        const groupMessages = {
+            general: [
+                { id: 1, sender: 'Alex Johnson', time: '10:50 AM', content: 'Hey everyone, we\'re excited to share our new project!', isOwn: false },
+                { id: 2, sender: 'You', time: '10:55 AM', content: 'This sounds great! When can we see the details?', isOwn: true },
+                { id: 3, sender: 'Sarah Miller', time: '11:02 AM', content: 'I\'ll share the proposal document shortly.', isOwn: false }
+            ],
+            design: [
+                { id: 1, sender: 'Sarah Miller', time: '09:15 AM', content: 'Good morning team! Let\'s review the new UI mockups today.', isOwn: false },
+                { id: 2, sender: 'You', time: '09:20 AM', content: 'I\'ve finished the homepage redesign. Should I share it here?', isOwn: true },
+                { id: 3, sender: 'Michael Chen', time: '09:25 AM', content: 'Yes, please share! I\'d love to see it.', isOwn: false }
+            ],
+            engineering: [
+                { id: 1, sender: 'David Wilson', time: '08:30 AM', content: 'The new API endpoints are ready for testing.', isOwn: false },
+                { id: 2, sender: 'You', time: '08:35 AM', content: 'Great! I\'ll run the integration tests this morning.', isOwn: true },
+                { id: 3, sender: 'Jessica Brown', time: '08:40 AM', content: 'I found a bug in the authentication flow. Working on a fix.', isOwn: false }
+            ],
+            marketing: [
+                { id: 1, sender: 'Emily Davis', time: '11:45 AM', content: 'The campaign launch is scheduled for next Monday.', isOwn: false },
+                { id: 2, sender: 'You', time: '11:50 AM', content: 'Do we have all the assets ready for the launch?', isOwn: true },
+                { id: 3, sender: 'Alex Johnson', time: '11:55 AM', content: 'Yes, everything is prepared. Just waiting for final approval.', isOwn: false }
+            ],
+            random: [
+                { id: 1, sender: 'Michael Chen', time: '03:20 PM', content: 'Anyone up for lunch later?', isOwn: false },
+                { id: 2, sender: 'You', time: '03:25 PM', content: 'I\'m in! What time are you thinking?', isOwn: true },
+                { id: 3, sender: 'Sarah Miller', time: '03:30 PM', content: 'Count me in too! How about 12:30?', isOwn: false }
+            ]
+        };
+        
+        // Group member counts
+        const groupMembers = {
+            general: 12,
+            design: 8,
+            engineering: 15,
+            marketing: 6,
+            random: 20
+        };
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', initApp);
+        
+        function initApp() {
+            // Welcome Page Event Listeners
+            userNameInput.addEventListener('input', validateWelcomeForm);
+            roomNameInput.addEventListener('input', validateWelcomeForm);
+            createRoomBtn.addEventListener('click', createRoom);
+            joinRoomBtn.addEventListener('click', joinRoom);
+            
+            // Chat Room Event Listeners
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            sidebarOpen.addEventListener('click', toggleSidebar);
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keydown', handleKeyDown);
+            messageInput.addEventListener('input', handleTyping);
+            attachFileBtn.addEventListener('click', showFileUploadModal);
+            emojiBtn.addEventListener('click', showEmojiPicker);
+            voiceBtn.addEventListener('click', showSpeechModal);
+            showParticipantsBtn.addEventListener('click', showParticipantsModal);
+            
+            // Search in sidebar
+            searchRoomsInput.addEventListener('input', searchGroups);
+            searchRoomsSidebarBtn.addEventListener('click', searchGroups);
+            
+            // Group switching
+            groupsList.querySelectorAll('li').forEach(item => {
+                item.addEventListener('click', () => switchGroup(item));
+            });
+            
+            // Shared Files Sidebar Event Listeners
+            toggleFilesBtn.addEventListener('click', toggleFilesSidebar);
+            closeFilesBtn.addEventListener('click', closeFilesSidebar);
+            
+            // Category tab functionality
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Render files for selected category
+                    const category = this.getAttribute('data-category');
+                    renderFiles(category);
+                });
+            });
+            
+            // Initialize with all files
+            renderFiles('all');
+            
+            // Menu Event Listeners
+            homeMenu.addEventListener('click', goToHome);
+            roomSettingsMenu.addEventListener('click', showRoomSettingsModal);
+            leaveRoomMenu.addEventListener('click', leaveRoom);
+            
+            // Modal Event Listeners
+            closeParticipantsBtn.addEventListener('click', closeParticipantsModal);
+            closeFileUploadBtn.addEventListener('click', closeFileUploadModal);
+            cancelUploadBtn.addEventListener('click', closeFileUploadModal);
+            uploadFilesBtn.addEventListener('click', uploadFiles);
+            closeEmojiBtn.addEventListener('click', closeEmojiModal);
+            
+            // Speech Recognition Event Listeners
+            closeSpeechBtn.addEventListener('click', closeSpeechModal);
+            startListeningBtn.addEventListener('click', startSpeechRecognition);
+            stopListeningBtn.addEventListener('click', stopSpeechRecognition);
+            cancelSpeechBtn.addEventListener('click', closeSpeechModal);
+            sendSpeechBtn.addEventListener('click', sendSpeechAsMessage);
+            allowMicrophoneBtn.addEventListener('click', allowMicrophoneAccess);
+            blockMicrophoneBtn.addEventListener('click', blockMicrophoneAccess);
+            manageMicrophoneBtn.addEventListener('click', manageMicrophone);
+            
+            // Alternative voice options
+            typeManuallyOption.addEventListener('click', () => selectVoiceOption('manual'));
+            simulateVoiceOption.addEventListener('click', () => selectVoiceOption('simulated'));
+            externalAppOption.addEventListener('click', () => selectVoiceOption('external'));
+            
+            // Room Settings Event Listeners
+            closeRoomSettingsBtn.addEventListener('click', closeRoomSettingsModal);
+            cancelRoomSettingsBtn.addEventListener('click', closeRoomSettingsModal);
+            saveRoomSettingsBtn.addEventListener('click', saveRoomSettings);
+            
+            // File Upload Event Listeners
+            fileDropArea.addEventListener('click', () => fileInput.click());
+            fileDropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileDropArea.classList.add('active');
+            });
+            fileDropArea.addEventListener('dragleave', () => {
+                fileDropArea.classList.remove('active');
+            });
+            fileDropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileDropArea.classList.remove('active');
+                handleFiles(e.dataTransfer.files);
+            });
+            fileInput.addEventListener('change', () => {
+                handleFiles(fileInput.files);
+            });
+            
+            // Initialize emoji picker
+            initEmojiPicker();
+            
+            // Initialize speech recognition
+            initSpeechRecognition();
+            
+            // Initialize resizable sidebars
+            initResizableSidebars();
+            
+            // Simulate incoming messages
+            simulateIncomingMessages();
+        }
+        
+        // Welcome Page Functions
+        function validateWelcomeForm() {
+            const userName = userNameInput.value.trim();
+            const roomName = roomNameInput.value.trim();
+            
+            const isUserNameValid = userName.length > 0;
+            const isRoomNameValid = roomName.length > 0;
+            
+            const isFormValid = isUserNameValid && isRoomNameValid;
+            
+            createRoomBtn.disabled = !isFormValid;
+            joinRoomBtn.disabled = !isFormValid;
+        }
+        
+        function createRoom() {
+            currentUser = userNameInput.value.trim();
+            currentRoom = roomNameInput.value.trim();
+            
+            if (!currentUser || !currentRoom) {
+                alert('Please enter both name and room name');
+                return;
+            }
+            
+            // Store in session storage
+            sessionStorage.setItem('userName', currentUser);
+            sessionStorage.setItem('userInitials', currentUser.charAt(0).toUpperCase());
+            
+            // Redirect to teamchat-plus.html with room parameter
+            window.location.href = `/teamchat-plus.html?room=${encodeURIComponent(currentRoom)}`;
+        }
+        
+        function joinRoom() {
+            // Same as create room for WebSocket-based chat
+            createRoom();
+        }
+        
+        function showPublicRooms() {
+            welcomePage.style.display = 'none';
+            roomsPage.style.display = 'block';
+            loadRooms();
+        }
+        
+        // Rooms Page Functions
+        function loadRooms() {
+            roomsGrid.innerHTML = '';
+            
+            sampleRooms.forEach(room => {
+                const roomCard = document.createElement('div');
+                roomCard.className = 'room-card card';
+                roomCard.innerHTML = `
+                    <h3>${room.name}</h3>
+                    <div class="room-meta">
+                        <span>${room.members} members</span>
+                        <span>🔓 Public</span>
+                    </div>
+                    <div class="room-actions">
+                        <button class="btn" data-room-id="${room.id}">
+                            Join Room
+                        </button>
+                    </div>
+                `;
+                
+                roomsGrid.appendChild(roomCard);
+                
+                // Add event listener to join button
+                const joinBtn = roomCard.querySelector('button');
+                joinBtn.addEventListener('click', () => {
+                    joinRoomFromList(room);
+                });
+            });
+        }
+        
+        function joinRoomFromList(room) {
+            currentUser = userNameInput.value.trim() || 'Guest User';
+            currentRoom = room.name;
+            
+            // Store in session storage
+            sessionStorage.setItem('userName', currentUser);
+            sessionStorage.setItem('userInitials', currentUser.charAt(0).toUpperCase());
+            
+            // Redirect to teamchat-plus.html with room parameter
+            window.location.href = `/teamchat-plus.html?room=${encodeURIComponent(currentRoom)}`;
+        }
+        
+        function filterRooms() {
+            const searchTerm = roomSearchInput.value.toLowerCase();
+            const roomCards = roomsGrid.querySelectorAll('.room-card');
+            
+            roomCards.forEach(card => {
+                const roomName = card.querySelector('h3').textContent.toLowerCase();
+                if (roomName.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        function searchRooms() {
+            const searchTerm = roomSearchInput.value.trim();
+            if (searchTerm) {
+                // Filter rooms based on search term
+                filterRooms();
+                showNotification(`Search results for "${searchTerm}"`, 'success');
+            } else {
+                // Reset to show all rooms
+                const roomCards = roomsGrid.querySelectorAll('.room-card');
+                roomCards.forEach(card => {
+                    card.style.display = 'block';
+                });
+            }
+        }
+        
+        function searchGroups() {
+            const searchTerm = searchRoomsInput.value.trim().toLowerCase();
+            const groupItems = groupsList.querySelectorAll('li');
+            
+            if (searchTerm) {
+                // Remove any existing highlights
+                groupItems.forEach(item => {
+                    item.classList.remove('highlighted');
+                });
+                
+                // Highlight matching groups
+                groupItems.forEach(item => {
+                    const groupName = item.textContent.toLowerCase();
+                    if (groupName.includes(searchTerm)) {
+                        item.classList.add('highlighted');
+                    }
+                });
+                
+                showNotification(`Found groups matching "${searchTerm}"`, 'success');
+            } else {
+                // Remove highlights when search is cleared
+                groupItems.forEach(item => {
+                    item.classList.remove('highlighted');
+                });
+            }
+        }
+        
+        function createPublicRoom() {
+            // For demo, go back to welcome page
+            roomsPage.style.display = 'none';
+            welcomePage.style.display = 'block';
+        }
+        
+        // Chat Room Functions
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarToggle.style.display = 'none';
+                sidebarOpen.style.display = 'block';
+            } else {
+                sidebarToggle.style.display = 'block';
+                sidebarOpen.style.display = 'none';
+            }
+        }
+        
+        function switchGroup(groupElement) {
+            // Update active group
+            groupsList.querySelectorAll('li').forEach(item => {
+                item.classList.remove('active');
+            });
+            groupElement.classList.add('active');
+            
+            // Update current group
+            currentGroup = groupElement.getAttribute('data-group');
+            
+            // Update room title and member count
+            roomTitle.textContent = groupElement.textContent;
+            memberCount.textContent = `${groupMembers[currentGroup]} members`;
+            
+            // Load messages for the selected group
+            loadMessages();
+            
+            showNotification(`Switched to ${groupElement.textContent}`, 'success');
+        }
+        
+        function loadMessages() {
+            chatMessages.innerHTML = '';
+            
+            const messages = groupMessages[currentGroup] || [];
+            
+            messages.forEach(message => {
+                addMessageToChat(message);
+            });
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function addMessageToChat(message) {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${message.isOwn ? 'own' : ''}`;
+            
+            messageElement.innerHTML = `
+                <div class="message-header">
+                    <span class="message-sender">${message.sender}</span>
+                    <span class="message-time">${message.time}</span>
+                </div>
+                <div class="message-content">${message.content}</div>
+            `;
+            
+            chatMessages.appendChild(messageElement);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        function handleTyping() {
+            if (!isTyping) {
+                isTyping = true;
+                // In a real app, you would send a "user is typing" signal to the server
+            }
+            
+            // Clear existing timer
+            clearTimeout(typingTimer);
+            
+            // Set a new timer
+            typingTimer = setTimeout(() => {
+                isTyping = false;
+                // In a real app, you would send a "user stopped typing" signal to the server
+            }, 1000);
+        }
+        
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            
+            if (messageText) {
+                // Create new message
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                const newMessage = {
+                    id: Date.now(),
+                    sender: 'You',
+                    time: timeString,
+                    content: messageText,
+                    isOwn: true
+                };
+                
+                // Add to current group messages
+                if (!groupMessages[currentGroup]) {
+                    groupMessages[currentGroup] = [];
+                }
+                groupMessages[currentGroup].push(newMessage);
+                
+                // Add to chat
+                addMessageToChat(newMessage);
+                
+                // Clear input
+                messageInput.value = '';
+                
+                // In a real app, you would send the message to the server here
+                
+                // Simulate a response after a short delay
+                setTimeout(() => {
+                    simulateResponse(messageText);
+                }, 1000 + Math.random() * 2000);
+            }
+        }
+        
+        function simulateResponse(userMessage) {
+            const responses = [
+                "That's a great point!",
+                "I agree with you.",
+                "Let me think about that...",
+                "Can you explain more?",
+                "I have a different perspective on that.",
+                "Thanks for sharing!",
+                "That's interesting!",
+                "I see what you mean.",
+                "Let's discuss this further in our next meeting.",
+                "I'll look into that."
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const responseMessage = {
+                id: Date.now(),
+                sender: sampleParticipants[Math.floor(Math.random() * sampleParticipants.length)].name,
+                time: timeString,
+                content: randomResponse,
+                isOwn: false
+            };
+            
+            // Add to current group messages
+            groupMessages[currentGroup].push(responseMessage);
+            
+            // Add to chat
+            addMessageToChat(responseMessage);
+        }
+        
+        function simulateIncomingMessages() {
+            // Simulate random incoming messages every 30-60 seconds
+            setInterval(() => {
+                if (chatRoom.style.display !== 'none') {
+                    const messages = [
+                        "Has anyone seen the latest design mockups?",
+                        "The meeting has been rescheduled to 3 PM.",
+                        "I've uploaded the latest report to the shared drive.",
+                        "Can someone review my pull request?",
+                        "Don't forget about the team lunch tomorrow!",
+                        "The project deadline has been extended by one week.",
+                        "I need feedback on the presentation slides.",
+                        "Who's available for a quick call?",
+                        "The server maintenance is scheduled for tonight.",
+                        "Great work on the latest release everyone!"
+                    ];
+                    
+                    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                    const now = new Date();
+                    const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    
+                    const incomingMessage = {
+                        id: Date.now(),
+                        sender: sampleParticipants[Math.floor(Math.random() * sampleParticipants.length)].name,
+                        time: timeString,
+                        content: randomMessage,
+                        isOwn: false
+                    };
+                    
+                    // Add to current group messages
+                    if (groupMessages[currentGroup]) {
+                        groupMessages[currentGroup].push(incomingMessage);
+                        
+                        // Add to chat
+                        addMessageToChat(incomingMessage);
+                        
+                        // Show notification
+                        showNotification(`New message in ${currentGroup}`, 'success');
+                    }
+                }
+            }, 30000 + Math.random() * 30000);
+        }
+        
+        function loadParticipants() {
+            participantList.innerHTML = '';
+            
+            sampleParticipants.forEach(participant => {
+                const participantItem = document.createElement('li');
+                participantItem.className = 'participant-item';
+                participantItem.innerHTML = `
+                    <div class="participant-avatar">${participant.avatar}</div>
+                    <div class="participant-info">
+                        <div class="participant-name">${participant.name}</div>
+                        <div class="participant-status ${participant.status}">${participant.status}</div>
+                    </div>
+                `;
+                
+                participantList.appendChild(participantItem);
+            });
+        }
+        
+        // Shared Files Sidebar Functions
+        function toggleFilesSidebar() {
+            filesSidebar.classList.toggle('collapsed');
+            
+            if (filesSidebar.classList.contains('collapsed')) {
+                toggleFilesBtn.textContent = '📁 Shared Files';
+            } else {
+                toggleFilesBtn.textContent = '📁 Hide Files';
+            }
+        }
+        
+        function closeFilesSidebar() {
+            filesSidebar.classList.add('collapsed');
+            toggleFilesBtn.textContent = '📁 Shared Files';
+        }
+        
+        // Function to render files based on category
+        function renderFiles(category) {
+            filesList.innerHTML = '';
+            
+            const files = filesData[category] || [];
+            
+            if (files.length === 0) {
+                filesList.innerHTML = '<div style="padding: 20px; text-align: center; color: #7f8c8d;">No files found</div>';
+                return;
+            }
+            
+            files.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                
+                // Determine icon based on file type
+                let iconClass = '';
+                let iconText = '';
+                
+                switch(file.type) {
+                    case 'pdf':
+                        iconClass = 'pdf';
+                        iconText = 'PDF';
+                        break;
+                    case 'figma':
+                        iconClass = 'figma';
+                        iconText = 'FG';
+                        break;
+                    case 'image':
+                        iconClass = 'image';
+                        iconText = 'IMG';
+                        break;
+                    case 'audio':
+                        iconClass = 'audio';
+                        iconText = 'AUD';
+                        break;
+                    case 'video':
+                        iconClass = 'video';
+                        iconText = 'VID';
+                        break;
+                    case 'archive':
+                        iconClass = 'archive';
+                        iconText = 'ZIP';
+                        break;
+                    default:
+                        iconClass = 'pdf';
+                        iconText = 'FILE';
+                }
+                
+                fileItem.innerHTML = `
+                    <div class="file-item-content">
+                        <div class="file-icon ${iconClass}">${iconText}</div>
+                        <div class="file-details">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-meta">
+                                <span>${file.owner}</span>
+                                <span>${file.date}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add click event to open file
+                fileItem.addEventListener('click', function() {
+                    alert(`Opening: ${file.name}`);
+                });
+                
+                filesList.appendChild(fileItem);
+            });
+        }
+        
+        // Menu Functions
+        function goToHome() {
+            // Go back to welcome page
+            chatRoom.style.display = 'none';
+            welcomePage.style.display = 'block';
+            showNotification('Returned to home', 'success');
+        }
+        
+        function showRoomSettingsModal() {
+            roomSettingsModal.classList.add('active');
+        }
+        
+        function closeRoomSettingsModal() {
+            roomSettingsModal.classList.remove('active');
+        }
+        
+        function saveRoomSettings() {
+            const roomName = document.getElementById('room-name-setting').value;
+            const roomDescription = document.getElementById('room-description').value;
+            const isPrivate = roomPrivateCheckbox.checked;
+            
+            // Update room title
+            roomTitle.textContent = roomName;
+            
+            // Show success message
+            showNotification('Room settings saved successfully!', 'success');
+            
+            // Close modal
+            closeRoomSettingsModal();
+        }
+        
+        function leaveRoom() {
+            // Confirm before leaving
+            if (confirm('Are you sure you want to leave this room?')) {
+                // Go back to welcome page
+                chatRoom.style.display = 'none';
+                welcomePage.style.display = 'block';
+                showNotification('You have left the room', 'success');
+            }
+        }
+        
+        // Speech Recognition Functions
+        function initSpeechRecognition() {
+            // Check if browser supports speech recognition
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+                
+                recognition.onstart = function() {
+                    isListening = true;
+                    speechStatus.textContent = 'Listening...';
+                    speechStatus.className = 'speech-status listening';
+                    startListeningBtn.disabled = true;
+                    stopListeningBtn.disabled = false;
+                };
+                
+                recognition.onresult = function(event) {
+                    let interimTranscript = '';
+                    let finalTranscript = '';
+                    
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+                    
+                    speechText.textContent = finalTranscript || interimTranscript;
+                    
+                    if (finalTranscript) {
+                        sendSpeechBtn.disabled = false;
+                    }
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error', event.error);
+                    speechStatus.textContent = `Error: ${event.error}`;
+                    speechStatus.className = 'speech-status error';
+                    isListening = false;
+                    startListeningBtn.disabled = false;
+                    stopListeningBtn.disabled = true;
+                };
+                
+                recognition.onend = function() {
+                    isListening = false;
+                    speechStatus.textContent = 'Stopped listening';
+                    speechStatus.className = 'speech-status';
+                    startListeningBtn.disabled = false;
+                    stopListeningBtn.disabled = true;
+                };
+            } else {
+                // Browser doesn't support speech recognition
+                speechStatus.textContent = 'Speech recognition not supported in this browser';
+                speechStatus.className = 'speech-status error';
+                startListeningBtn.disabled = true;
+            }
+        }
+        
+        function showSpeechModal() {
+            speechModal.classList.add('active');
+            speechText.textContent = 'Your speech will appear here...';
+            speechStatus.textContent = 'Click "Start Listening" to begin';
+            speechStatus.className = 'speech-status';
+            sendSpeechBtn.disabled = true;
+            
+            // Reset voice options
+            document.querySelectorAll('.voice-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            
+            // Check microphone permission
+            checkMicrophonePermission();
+        }
+        
+        function selectVoiceOption(method) {
+            // Update active state
+            document.querySelectorAll('.voice-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.closest('.voice-option').classList.add('active');
+            
+            if (method === 'manual') {
+                closeSpeechModal();
+                messageInput.focus();
+                showNotification('You can now type your message manually', 'success');
+            } else if (method === 'simulated') {
+                // Simulate voice input with sample text
+                const sampleTexts = [
+                    "Hello team, I have an update on the project timeline",
+                    "Can we schedule a meeting to discuss the new features?",
+                    "I need help with the integration testing",
+                    "The design mockups look great, let's implement them",
+                    "Please review my latest changes when you have time"
+                ];
+                const randomText = sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
+                speechText.textContent = randomText;
+                sendSpeechBtn.disabled = false;
+                showNotification('Simulated voice input ready to send', 'success');
+            } else if (method === 'external') {
+                showNotification('You can use any external voice-to-text app and paste the text here', 'success');
+                speechText.textContent = 'Paste your transcribed text here...';
+                sendSpeechBtn.disabled = false;
+            }
+        }
+        
+        function checkMicrophonePermission() {
+            // Hide both permission sections initially
+            microphonePermission.style.display = 'none';
+            noMicrophone.style.display = 'none';
+            alternativeVoice.style.display = 'block';
+            
+            // Check if browser supports media devices
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                noMicrophone.style.display = 'block';
+                return;
+            }
+            
+            // Check for microphone permission
+            navigator.mediaDevices.enumerateDevices()
+                .then(devices => {
+                    const hasMicrophone = devices.some(device => device.kind === 'audioinput');
+                    
+                    if (!hasMicrophone) {
+                        noMicrophone.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Check if we already have permission
+                    navigator.mediaDevices.getUserMedia({ audio: true })
+                        .then(stream => {
+                            // We have permission
+                            hasMicrophonePermission = true;
+                            // Stop the stream immediately since we just wanted to check permission
+                            stream.getTracks().forEach(track => track.stop());
+                        })
+                        .catch(error => {
+                            // We don't have permission yet
+                            microphonePermission.style.display = 'block';
+                        });
+                })
+                .catch(error => {
+                    console.error('Error enumerating devices:', error);
+                    noMicrophone.style.display = 'block';
+                });
+        }
+        
+        function allowMicrophoneAccess() {
+            // Request microphone access
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    hasMicrophonePermission = true;
+                    microphonePermission.style.display = 'none';
+                    showNotification('Microphone access granted!', 'success');
+                    // Stop the stream immediately since we just wanted to get permission
+                    stream.getTracks().forEach(track => track.stop());
+                })
+                .catch(error => {
+                    console.error('Error accessing microphone:', error);
+                    showNotification('Could not access microphone. Please check permissions.', 'error');
+                });
+        }
+        
+        function blockMicrophoneAccess() {
+            microphonePermission.style.display = 'none';
+            showNotification('Microphone access blocked', 'error');
+        }
+        
+        function manageMicrophone() {
+            showNotification('Please check your microphone settings in your browser', 'success');
+        }
+        
+        function closeSpeechModal() {
+            if (isListening) {
+                stopSpeechRecognition();
+            }
+            speechModal.classList.remove('active');
+        }
+        
+        function startSpeechRecognition() {
+            if (!hasMicrophonePermission) {
+                showNotification('Please allow microphone access first', 'error');
+                return;
+            }
+            
+            if (recognition && !isListening) {
+                recognition.start();
+            }
+        }
+        
+        function stopSpeechRecognition() {
+            if (recognition && isListening) {
+                recognition.stop();
+            }
+        }
+        
+        function sendSpeechAsMessage() {
+            const speechTextContent = speechText.textContent.trim();
+            
+            if (speechTextContent && speechTextContent !== 'Your speech will appear here...' && speechTextContent !== 'Paste your transcribed text here...') {
+                // Create new message from speech
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                const newMessage = {
+                    id: Date.now(),
+                    sender: 'You',
+                    time: timeString,
+                    content: speechTextContent,
+                    isOwn: true
+                };
+                
+                // Add to current group messages
+                if (!groupMessages[currentGroup]) {
+                    groupMessages[currentGroup] = [];
+                }
+                groupMessages[currentGroup].push(newMessage);
+                
+                // Add to chat
+                addMessageToChat(newMessage);
+                
+                // Close modal
+                closeSpeechModal();
+                
+                // Show success message
+                showNotification('Voice message sent!', 'success');
+                
+                // Simulate a response after a short delay
+                setTimeout(() => {
+                    simulateResponse(speechTextContent);
+                }, 1000 + Math.random() * 2000);
+            }
+        }
+        
+        // Modal Functions
+        function showParticipantsModal() {
+            participantsModal.classList.add('active');
+        }
+        
+        function closeParticipantsModal() {
+            participantsModal.classList.remove('active');
+        }
+        
+        function showFileUploadModal() {
+            fileUploadModal.classList.add('active');
+            fileList.innerHTML = '';
+        }
+        
+        function closeFileUploadModal() {
+            fileUploadModal.classList.remove('active');
+            fileInput.value = '';
+        }
+        
+        function handleFiles(files) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                addFileToList(file);
+            }
+        }
+        
+        function addFileToList(file) {
+            const fileItem = document.createElement('li');
+            fileItem.className = 'file-item';
+            
+            const fileSize = formatFileSize(file.size);
+            const fileType = getFileType(file.name);
+            
+            fileItem.innerHTML = `
+                <div class="file-icon">${fileType.icon}</div>
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-meta">${fileSize}</div>
+                </div>
+            `;
+            
+            fileList.appendChild(fileItem);
+        }
+        
+        function uploadFiles() {
+            // In a real app, you would upload files to a server here
+            showNotification('Files uploaded successfully!', 'success');
+            closeFileUploadModal();
+            
+            // Simulate file sharing in chat
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const fileMessage = {
+                id: Date.now(),
+                sender: 'You',
+                time: timeString,
+                content: '📎 Shared a file',
+                isOwn: true
+            };
+            
+            // Add to current group messages
+            groupMessages[currentGroup].push(fileMessage);
+            
+            // Add to chat
+            addMessageToChat(fileMessage);
+        }
+        
+        function showEmojiPicker() {
+            emojiModal.classList.add('active');
+        }
+        
+        function closeEmojiModal() {
+            emojiModal.classList.remove('active');
+        }
+        
+        function initEmojiPicker() {
+            const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'];
+            
+            emojis.forEach(emoji => {
+                const emojiElement = document.createElement('button');
+                emojiElement.className = 'input-action-btn';
+                emojiElement.textContent = emoji;
+                emojiElement.style.fontSize = '24px';
+                emojiElement.addEventListener('click', () => {
+                    messageInput.value += emoji;
+                    closeEmojiModal();
+                });
+                
+                emojiContainer.appendChild(emojiElement);
+            });
+        }
+        
+        // Utility Functions
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const types = {
+                pdf: { icon: '📄', name: 'PDF' },
+                doc: { icon: '📄', name: 'Document' },
+                docx: { icon: '📄', name: 'Document' },
+                txt: { icon: '📄', name: 'Text' },
+                jpg: { icon: '🖼️', name: 'Image' },
+                jpeg: { icon: '🖼️', name: 'Image' },
+                png: { icon: '🖼️', name: 'Image' },
+                gif: { icon: '🖼️', name: 'Image' },
+                mp4: { icon: '🎥', name: 'Video' },
+                mov: { icon: '🎥', name: 'Video' },
+                avi: { icon: '🎥', name: 'Video' },
+                mp3: { icon: '🎵', name: 'Audio' },
+                wav: { icon: '🎵', name: 'Audio' },
+                zip: { icon: '📦', name: 'Archive' },
+                rar: { icon: '📦', name: 'Archive' }
+            };
+            
+            return types[ext] || { icon: '📎', name: 'File' };
+        }
+        
+        // Resizable Sidebars Functionality
+        function initResizableSidebars() {
+            // Left Sidebar Resizer
+            let isResizingLeft = false;
+            let startXLeft = 0;
+            let startWidthLeft = 0;
+            
+            if (sidebarResizer) {
+                sidebarResizer.addEventListener('mousedown', (e) => {
+                    isResizingLeft = true;
+                    startXLeft = e.clientX;
+                    startWidthLeft = sidebar.offsetWidth;
+                    sidebarResizer.classList.add('resizing');
+                    document.body.style.cursor = 'ew-resize';
+                    document.body.style.userSelect = 'none';
+                    e.preventDefault();
+                });
+            }
+            
+            // Right Files Sidebar Resizer
+            let isResizingRight = false;
+            let startXRight = 0;
+            let startWidthRight = 0;
+            
+            if (filesSidebarResizer) {
+                filesSidebarResizer.addEventListener('mousedown', (e) => {
+                    isResizingRight = true;
+                    startXRight = e.clientX;
+                    startWidthRight = filesSidebar.offsetWidth;
+                    filesSidebarResizer.classList.add('resizing');
+                    document.body.style.cursor = 'ew-resize';
+                    document.body.style.userSelect = 'none';
+                    e.preventDefault();
+                });
+            }
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isResizingLeft) {
+                    const deltaX = e.clientX - startXLeft;
+                    const newWidth = startWidthLeft + deltaX;
+                    const minWidth = parseInt(getComputedStyle(sidebar).minWidth);
+                    const maxWidth = parseInt(getComputedStyle(sidebar).maxWidth);
+                    
+                    if (newWidth >= minWidth && newWidth <= maxWidth) {
+                        sidebar.style.width = newWidth + 'px';
+                    }
+                }
+                
+                if (isResizingRight) {
+                    const deltaX = startXRight - e.clientX;
+                    const newWidth = startWidthRight + deltaX;
+                    const minWidth = parseInt(getComputedStyle(filesSidebar).minWidth);
+                    const maxWidth = parseInt(getComputedStyle(filesSidebar).maxWidth);
+                    
+                    if (newWidth >= minWidth && newWidth <= maxWidth) {
+                        filesSidebar.style.width = newWidth + 'px';
+                    }
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isResizingLeft) {
+                    isResizingLeft = false;
+                    sidebarResizer.classList.remove('resizing');
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                }
+                
+                if (isResizingRight) {
+                    isResizingRight = false;
+                    filesSidebarResizer.classList.remove('resizing');
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                }
+            });
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            const notificationIcon = notification.querySelector('.notification-icon');
+            const notificationMessage = notification.querySelector('.notification-message');
+            
+            notification.className = `notification ${type}`;
+            notificationMessage.textContent = message;
+            
+            if (type === 'success') {
+                notificationIcon.innerHTML = '✓';
+            } else if (type === 'error') {
+                notificationIcon.innerHTML = '✗';
+            }
+            
+            notification.style.display = 'flex';
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

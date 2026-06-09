@@ -1,0 +1,89 @@
+╔══════════════════════════════════════════════════════════════╗
+║           TeamChat+ - Installation Instructions             ║
+╚══════════════════════════════════════════════════════════════╝
+
+STEP 1: Install Python Dependencies
+────────────────────────────────────────────────────────────────
+Open Command Prompt or PowerShell and run:
+
+    pip install -r requirements.txt
+
+If that doesn't work, try:
+
+    python -m pip install -r requirements.txt
+
+
+STEP 2: Start the Server
+────────────────────────────────────────────────────────────────
+Run this command:
+
+    python server.py
+
+You should see:
+    🚀 TeamChat+ Server starting...
+    📍 Server running on http://localhost:8000
+
+
+STEP 3: Open Your Browser
+────────────────────────────────────────────────────────────────
+Navigate to:
+
+    http://localhost:8000
+
+
+STEP 4: Create a Room and Start Chatting!
+────────────────────────────────────────────────────────────────
+1. Enter your display name
+2. Enter a room name
+3. Click "Create Room" or "Join Room"
+4. Start messaging!
+
+
+TEST WITH MULTIPLE USERS:
+────────────────────────────────────────────────────────────────
+• Open multiple browser windows
+• Use different names in each
+• Join the same room
+• See messages in real-time!
+
+
+FEATURES:
+────────────────────────────────────────────────────────────────
+✓ Real-time messaging via WebSockets
+✓ File sharing with automatic categorization
+✓ Multiple chat rooms
+✓ Live member count
+✓ Room search
+✓ Modern responsive UI
+
+
+TROUBLESHOOTING:
+────────────────────────────────────────────────────────────────
+Problem: "ModuleNotFoundError"
+Solution: pip install -r requirements.txt
+
+Problem: "Port 8000 already in use"
+Solution: Kill other apps using port 8000 or change port in server.py
+
+Problem: Messages not appearing
+Solution: Refresh browser, check WebSocket connection
+
+Problem: Files not uploading
+Solution: Check uploads/ folder exists and has write permissions
+
+
+STOP THE SERVER:
+────────────────────────────────────────────────────────────────
+Press CTRL+C in the terminal
+
+
+MORE INFORMATION:
+────────────────────────────────────────────────────────────────
+• See START_HERE.md for detailed quick start guide
+• See README.md for complete documentation
+
+
+Support: Check browser console (F12) for error messages
+
+Built with FastAPI + WebSockets
+
