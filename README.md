@@ -281,15 +281,3 @@ uvicorn server:app --reload --host 0.0.0.0 --port 8000
 - Check browser console for errors
 - Ensure room name matches across clients
 
-## License
-
-This project is open source and available for educational purposes.
-
-## Contributing
-
-Contributions welcome! Feel free to submit issues and pull requests.
-
-## Support
-
-For issues or questions, please create an issue on the repository.
-
